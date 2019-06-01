@@ -3,7 +3,7 @@
 # import socks
 # import socket
 import telebot
-import pyowm
+# import pyowm
 
 # owm = pyowm.OWM('ee53bd221ce171abd050ae88362dc095', language="ru")
 TOKEN = '823149895:AAHOU6KMCsjF-swa7fKLFyVUZpUoQvREy8U'
