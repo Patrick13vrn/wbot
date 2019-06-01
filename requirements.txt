@@ -4,7 +4,6 @@ Django==2.2.1
 geojson==2.4.1
 gunicorn==19.9.0
 idna==2.8
-pyowm==2.10.0
 pyTelegramBotAPI==3.6.6
 pytz==2019.1
 requests==2.7.0
@@ -12,3 +11,4 @@ six==1.12.0
 sqlparse==0.3.0
 telebot==0.0.3
 urllib3==1.25.3
+pyowm==2.8.0
