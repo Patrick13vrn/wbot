@@ -1,0 +1,16 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+pytz = "==2019.1"
+requests = "==2.7.0"
+sqlparse = "==0.3.0"
+telebot = "==0.0.3"
+Django = "==2.2.1"
+
+[requires]
+python_version = "3.7"
