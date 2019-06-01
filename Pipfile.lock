@@ -1,11 +1,10 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "f4465f5eb89379567149add8e91c3e6ebfc7cb846fdd273cf84a781cbe3ba287"
+            "sha256": "8be51acb4b174cfe229d6ffd1c946f7b7bde0ef9df8414c12cc69f43d63475a8"
         },
         "pipfile-spec": 6,
         "requires": {
-            "pyTelegramBotAPI": "3.6.6",
             "python_version": "3.7.3"
         },
         "sources": [
@@ -25,6 +24,13 @@
             "index": "pypi",
             "version": "==2.2.1"
         },
+        "pytelegrambotapi": {
+            "hashes": [
+                "sha256:a4e8a98f97508a1c502c5a357536cf6c6e40dc4e5d4e58ebaedfba2d4f637e03"
+            ],
+            "index": "pypi",
+            "version": "==3.6.6"
+        },
         "pytz": {
             "hashes": [
                 "sha256:303879e36b721603cc54604edcac9d20401bdbe31e1e4fdee5b9f98d5d31dfda",
@@ -40,6 +46,13 @@
             ],
             "index": "pypi",
             "version": "==2.7.0"
+        },
+        "six": {
+            "hashes": [
+                "sha256:3350809f0555b11f552448330d0b52d5f24c91a322ea4a15ef22629740f3761c",
+                "sha256:d16a0141ec1a18405cd4ce8b4613101da75da0e9a7aec5bdd4fa804d0e0eba73"
+            ],
+            "version": "==1.12.0"
         },
         "sqlparse": {
             "hashes": [
