@@ -2,6 +2,7 @@ certifi==2019.3.9
 chardet==3.0.4
 Django==2.2.1
 geojson==2.4.1
+gunicorn==19.9.0
 idna==2.8
 pyowm==2.10.0
 pyTelegramBotAPI==3.6.6
