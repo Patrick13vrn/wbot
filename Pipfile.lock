@@ -1,10 +1,11 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "85aea40509259c2c3b6803de3239cfad9e91746f69516c21baf7ef5d8f7807ac"
+            "sha256": "f4465f5eb89379567149add8e91c3e6ebfc7cb846fdd273cf84a781cbe3ba287"
         },
         "pipfile-spec": 6,
         "requires": {
+            "pyTelegramBotAPI": "3.6.6",
             "python_version": "3.7.3"
         },
         "sources": [
