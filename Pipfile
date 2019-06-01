@@ -13,4 +13,4 @@ telebot = "==0.0.3"
 Django = "==2.2.1"
 
 [requires]
-python_version = "3.7"
+python_version = "3.7.3"
