@@ -1,11 +1,13 @@
 import telebot
 import pyowm
+from datetime import datetime, timedelta
 
-owm = pyowm.OWM('ee53bd221ce171abd050ae88362dc095', language="ru")
-TOKEN = '823149895:AAHOU6KMCsjF-swa7fKLFyVUZpUoQvREy8U'
+
+TOKEN = '823149895:AAGUwtRQ9dOQPvtqA8ZxZYmhd2MA4GbUK8k'
 owm = pyowm.OWM('ee53bd221ce171abd050ae88362dc095')
 bot = telebot.TeleBot(TOKEN)
 trans_detailed = {'clear sky': 'Ясно',
+                  'light intensity shower rain': 'Морось',
                   'few clouds': 'Переменная облачность',
                   'overcast clouds': 'Облачно',
                   'scattered clouds': 'Облачно',
@@ -17,7 +19,10 @@ trans_detailed = {'clear sky': 'Ясно',
                   'mist': 'Дымка',
                   }
 
-err_mesage = 'Вводи нормально, дуралей!'
+err_message = 'Что-то пошло не так...'
+weather_1h = datetime.now() + timedelta(hours=1)
+weather_3h = datetime.now() + timedelta(hours=3)
+weather_5h = datetime.now() + timedelta(hours=5)
 
 
 @bot.message_handler(commands=['start', 'go'])
@@ -30,7 +35,9 @@ def start_handler(message):
 def send_welcome(message):
     try:
         observation = owm.weather_at_place(message.text)
+        f_3h = owm.three_hours_forecast(message.text)
         w = observation.get_weather()
+        w2 = f_3h.get_forecast()
         answer = 'Сегодня в ' + message.text + ':\n\n' + \
                  str(trans_detailed[(w.get_detailed_status())]) + \
                  '\nТемпература воздуха - ' + str(w.get_temperature('celsius')['temp']) + '°' + \
@@ -39,11 +46,12 @@ def send_welcome(message):
                  '\nНаправление - ' + str(w.get_wind()['deg']) + '°' + \
                  '\nАтмосферное давление - ' + str("{0:.0f}".format(round(w.get_pressure()['press'] / 1.333,
                                                                           0))) + ' мм.рт.ст' + \
-                 '\nОтносительная влажность - ' + str(w.get_humidity()) + '%'
-
+                 '\nОтносительная влажность - ' + str(w.get_humidity()) + '%\n\n\n' + 'Прогноз на 3 дня:\n'
         bot.send_message(message.chat.id, answer)
+        # forecast = str(w2.get_weathers())
+        # bot.send_message(message.chat.id, forecast)
     except:
-        bot.send_message(message.chat.id, err_mesage)
+        bot.send_message(message.chat.id, err_message)
 
 
 bot.polling(none_stop=True)
