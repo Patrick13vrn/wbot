@@ -63,7 +63,8 @@ def send_welcome(message):
             f_status_detailed = str(weather.get_detailed_status())
             forecast = f_date + ' ' + f_temp + ' ' + f_status_detailed + ' ' + '\n'
             a_forecast = a_forecast + str(forecast)
-            if '{:%d %b - %H:%M}'.format(weather.get_reference_time('date')) <= '{:%d %b - %H:%M}'.format(
+            if '{:%d %b - %H:%M}'.format(
+                    weather.get_reference_time('date') + timedelta(hours=3)) <= '{:%d %b - %H:%M}'.format(
                     (datetime.now() + timedelta(days=3))):
                 # str(trans_detailed[(w.get_detailed_status())]) + \
                 answer = 'Сегодня в ' + message.text + ':\n\n' + str((w.get_detailed_status())) + \
