@@ -65,7 +65,7 @@ def send_welcome(message):
             a_forecast = a_forecast + str(forecast)
             if '{:%d %b - %H:%M}'.format(
                     weather.get_reference_time('date') + timedelta(hours=3)) <= '{:%d %b - %H:%M}'.format(
-                    (datetime.now() + timedelta(days=3))):
+                    (datetime.now())):
                 # str(trans_detailed[(w.get_detailed_status())]) + \
                 answer = 'Сегодня в ' + message.text + ':\n\n' + str((w.get_detailed_status())) + \
                          '\nТемпература воздуха - ' + str(w.get_temperature('celsius')['temp']) + '°' + \
