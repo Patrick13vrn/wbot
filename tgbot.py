@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import locale
 
 # locale.setlocale(locale.LC_ALL, 'ru_RU')
-locale.setlocale(locale.LC_ALL, 'ru_RU.utf8')
+# locale.setlocale(locale.LC_ALL, 'ru_RU.utf8')
 TOKEN = '823149895:AAGUwtRQ9dOQPvtqA8ZxZYmhd2MA4GbUK8k'
 owm = pyowm.OWM('ee53bd221ce171abd050ae88362dc095', language='ru')
 bot = telebot.TeleBot(TOKEN)
