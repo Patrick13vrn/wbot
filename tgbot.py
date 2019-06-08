@@ -1,7 +1,7 @@
 import telebot
 import pyowm
 from datetime import datetime, timedelta
-import locale
+# import locale
 
 # locale.setlocale(locale.LC_ALL, 'ru_RU')
 # locale.setlocale(locale.LC_ALL, 'ru_RU.utf8')
