@@ -3,7 +3,6 @@ import pyowm
 from datetime import datetime, timedelta
 import locale
 
-# locale.setlocale(locale.LC_ALL, 'ru_RU')
 locale.setlocale(locale.LC_ALL, 'ru_RU.utf8')
 TOKEN = '823149895:AAGUwtRQ9dOQPvtqA8ZxZYmhd2MA4GbUK8k'
 owm = pyowm.OWM('ee53bd221ce171abd050ae88362dc095', language='ru')
@@ -45,7 +44,7 @@ def send_welcome(message):
         a_forecast = ''
         forecast = ''
 
-        w_det = w.get_detailed_status()
+        w_det = (w.get_detailed_status()).title()
         w_cloud = w.get_clouds()
         w_humid = w.get_humidity()
         w_rec_time = w.get_reference_time(timeformat='date') + timedelta(hours=3)
@@ -58,8 +57,11 @@ def send_welcome(message):
         except KeyError:
             w_wdeg = 0.0
 
-        for weather in w2:
+        # current day weather forecast
+        #         for weather in w2:
 
+        # 3days weather forecast
+        for weather in w2:
             f_date2 = (datetime.fromtimestamp(weather.get_reference_time()))
             f_date = datetime.strptime(str(f_date2), '%Y-%m-%d %H:%M:%S')
             f_now2 = (datetime.strftime((datetime.today().replace(microsecond=0)), '%Y-%m-%d %H:%M:%S'))
@@ -67,7 +69,14 @@ def send_welcome(message):
 
             f_time = datetime.strftime(f_date, '%H')
             f_night = '03'
+            f_morning = '09'
             f_day = '15'
+            f_evening = '18'
+            f_wtime = {'night': '03',
+                       'morning': '09',
+                       'day': '15',
+                       'evening': '18'}
+
             f_end = f_now.replace(hour=0, minute=0, second=0) + timedelta(days=3)
             f_now3 = f_now.replace(hour=0, minute=0, second=0)
             f_date3 = f_date.replace(hour=0, minute=0, second=0)
@@ -86,6 +95,21 @@ def send_welcome(message):
             else:
                 lastrain = str(round(f_rain["3h"]))
 
+            # вывод прогноза на сегодня
+            if f_date3 < f_now3 + timedelta(days=1):
+                if lastrain != '0':
+                    rain = ' (' + lastrain + ' мм)'
+                else:
+                    rain = ''
+
+                template = f_temp + '°, ' + f_status_detailed + rain + '\n'
+                forecast += str(datetime.strftime(f_date, '%H:%M')) + ' '
+                forecast += template
+
+
+
+
+            # вывод прогноза на 3 дня
             if f_now3 < f_date3 <= f_end:
                 if lastrain != '0':
                     rain = ' (' + lastrain + ' мм)'
@@ -97,16 +121,16 @@ def send_welcome(message):
                     a_forecast += 'Ночью: ' + template
                 elif f_time == f_day:
                     a_forecast += 'Днём: ' + template + '\n'
-
-        answer = 'Сегодня в ' + texts + ':\n\n' + str(w_det).title() + \
+        emoji = b'\xE2\x9B\x85'.decode('utf-8')
+        answer = '*Сейчас в ' + texts + ':*\n\n' + emoji + str(w_det).title() + \
                  '\nТемпература воздуха - ' + str(w_temp) + '°' + \
                  '\nОблачность - ' + str(w_cloud) + '%' + \
                  '\nВетер ' + str(w_wspeed) + ' м/с, ' + wind_d(w_wdeg) + \
                  '\nАтмосферное давление - ' + str("{0:.0f}".format(round(w_press / 1.333, 0))) + ' мм.рт.ст' + \
                  '\nОтносительная влажность - ' + str(w_humid) + '%' + \
-                 '\nОбновление ' + str('{:%d.%m.%y %H:%M:%S}'.format(w_rec_time)) + \
-                 '\n\n\n' + 'Прогноз на 3 дня:\n' + str(a_forecast)
-        bot.send_message(message.chat.id, answer)
+                 '\n_Обновление ' + str('{:%d.%m.%y %H:%M:%S}'.format(w_rec_time)) + '_\n\n' + str(forecast) + \
+                 '\n' + 'Прогноз на 3 дня:\n\n' + str(a_forecast)
+        bot.send_message(message.chat.id, answer, parse_mode='Markdown')
 
 
     except Exception as e:
