@@ -1,6 +1,7 @@
 import telebot
 import pyowm
 from datetime import datetime, timedelta
+from telebot import types
 import locale
 
 locale.setlocale(locale.LC_ALL, 'ru_RU.utf8')
@@ -100,15 +101,31 @@ emoji = {
 err_message = 'Что-то пошло не так...'
 
 
+
 @bot.message_handler(commands=['start', 'go'])
 def start_handler(message):
     bot.send_message(
         message.chat.id, 'Привет!\n\nНапишите название города, погоду в котором вы хотели бы узнать.')
 
 
+@bot.message_handler(commands=['help'])
+def start_handler(message):
+    bot.send_message(
+        message.chat.id, 'Просто пришите название города на русском языке   .')
+
+
+markup = types.ReplyKeyboardMarkup(row_width=2)
+itembtn1 = types.KeyboardButton('Белгород')
+itembtn2 = types.KeyboardButton('Воронеж')
+itembtn3 = types.KeyboardButton('Москва')
+markup.add(itembtn1, itembtn2, itembtn3)
+# bot.send_message(message.chat.id, "Choose one letter:", reply_markup=markup)
+
+
 @bot.message_handler(content_types=['text'])
 def send_welcome(message):
     try:
+        user = message.from_user
         texts = message.text
         observation = owm.weather_at_place(texts)
         f_3h = owm.three_hours_forecast(texts)
@@ -195,7 +212,7 @@ def send_welcome(message):
                     a_forecast += emoji.get('night') + template
                 elif f_time == f_day:
                     a_forecast += emoji.get('day') + template + '\n'
-        answer = '*Сейчас в ' + texts + ':*\n\n' + emojies.get(w_code, '') + str(w_det).title() + \
+        answer = user.first_name + ', *Сейчас в ' + texts + ':*\n\n' + emojies.get(w_code, '') + str(w_det).title() + \
                  '\nТемпература воздуха: ' + temp(w_temp) + '°' + \
                  '\nОблачность: ' + str(w_cloud) + '%' + \
                  '\nВетер: ' + str(w_wspeed) + ' м/с, ' + wind_d(w_wdeg) + \
@@ -203,7 +220,7 @@ def send_welcome(message):
                  '\nОтносительная влажность: ' + str(w_humid) + '%' + \
                  '\n_Обновление от ' + str('{:%d.%m.%y %H:%M:%S}'.format(w_rec_time)) + '_\n\n' + str(forecast) + \
                  '\n' + '*Прогноз на 3 дня:*\n\n' + str(a_forecast)
-        bot.send_message(message.chat.id, answer, parse_mode='Markdown')
+        bot.send_message(message.chat.id, answer, parse_mode='Markdown', reply_markup=markup)
 
     except Exception as e:
         bot.send_message(message.chat.id, e)
