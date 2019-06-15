@@ -10,6 +10,7 @@ owm = pyowm.OWM('ee53bd221ce171abd050ae88362dc095', language='ru')
 bot = telebot.TeleBot(TOKEN)
 
 
+# wind direction degree to NSWE
 def wind_d(direction):
     return {
         direction == 0.0: '',
@@ -25,6 +26,7 @@ def wind_d(direction):
     }[True]
 
 
+# temp add plus and minus
 def temp(temp):
     temp2 = float(temp)
     if temp2 < 0:
@@ -37,6 +39,7 @@ def temp(temp):
     return temp_result
 
 
+# emoji weather condition
 emojies = {
     200: "\u26C8",  # гроза с мелким дождём
     201: "\u26C8",  # гроза с дождём
@@ -92,60 +95,45 @@ emojies = {
     804: "\u2601",  # пасмурно
 }
 
+# emoji constants
 emoji = {
     "day": "\u2600",
     "night": "\U0001F319",
     "temp": "\U0001F321",
 }
 
+# messages
 err_message = 'Что-то пошло не так...'
 
 
+# greating message
 @bot.message_handler(commands=['start', 'go'])
 def start_handler(message):
     bot.send_message(
         message.chat.id, 'Привет!\n\nНапишите название города, погоду в котором вы хотели бы узнать.')
 
 
+# /help message
 @bot.message_handler(commands=['help'])
 def start_handler(message):
     bot.send_message(
         message.chat.id, 'Просто пришите название города на русском языке   .')
 
 
-markup = types.ReplyKeyboardMarkup(row_width=0)
-markup.add()
+markup = types.ReplyKeyboardMarkup(row_width=1)
+markup.add('1')
+hide_markup = telebot.types.ReplyKeyboardRemove()
 
 
-# bot.send_message(message.chat.id, "Choose one letter:", reply_markup=markup)
 
-def build_menu(buttons,
-               n_cols,
-               header_buttons=None,
-               footer_buttons=None):
-    menu = [buttons[i:i + n_cols] for i in range(0, len(buttons), n_cols)]
-    if header_buttons:
-        menu.insert(0, [header_buttons])
-    if footer_buttons:
-        menu.append([footer_buttons])
-    return menu
-
-
-# some_strings = ["col1", "col2", "row2"]
-# button_list = [[KeyboardButton(s)] for s in some_strings]
-# reply_markup = InlineKeyboardMarkup(util.build_menu(button_list, n_cols=2))
-# bot.send_message(..., "A two-column menu", reply_markup=reply_markup)
 
 @bot.message_handler(content_types=['text'])
 def send_welcome(message):
     try:
-        keyboardmain = types.InlineKeyboardMarkup(row_width=2)
-        first_button = types.InlineKeyboardButton(text='Белгород', callback_data="first")
-        second_button = types.InlineKeyboardButton(text='Воронеж', callback_data="second")
-        keyboardmain.add(first_button, second_button)
 
         user = message.from_user
         texts = message.text
+        chat_id = message.chat.id
         observation = owm.weather_at_place(texts)
         f_3h = owm.three_hours_forecast(texts)
         w = observation.get_weather()
@@ -240,38 +228,12 @@ def send_welcome(message):
                  '\n_Обновление от ' + str('{:%d.%m.%y %H:%M:%S}'.format(w_rec_time)) + '_\n\n' + str(forecast) + \
                  '\n' + '*Прогноз на 3 дня:*\n\n' + str(a_forecast)
 
-        bot.send_message(message.chat.id, answer, parse_mode='Markdown', reply_markup=keyboardmain)
+        bot.send_message(message.chat.id, answer, parse_mode='Markdown', reply_markup=hide_markup)
 
-        @bot.callback_query_handler(func=lambda call: True)
-        def callback_inline(call):
-            if call.data == "back":
-                keyboardmain = types.InlineKeyboardMarkup(row_width=2)
-                first_button = types.InlineKeyboardButton(text='Белгород', callback_data="first")
-                second_button = types.InlineKeyboardButton(text='Воронеж', callback_data="second")
-                keyboardmain.add(first_button, second_button)
-                bot.edit_message_text(chat_id=call.message.chat.id, parse_mode='Markdown',
-                                      message_id=call.message.message_id, text=answer,
-                                      reply_markup=keyboard)
 
-            if call.data == "first":
-                keyboard = types.InlineKeyboardMarkup()
-                back_button = types.InlineKeyboardButton(text="Назад", callback_data="back")
-                keyboard.add(back_button)
-                bot.edit_message_text(chat_id=call.message.chat.id, parse_mode='Markdown', message_id=call.message.message_id, text=answer,
-                                      reply_markup=keyboard)
 
     except Exception as e:
         bot.send_message(message.chat.id, e)
 
-
-# @bot.callback_query_handler(func=lambda call:True)
-# def callback_inline(call):
-#     if call.data == "first":
-#         keyboard = types.InlineKeyboardMarkup()
-#         rele1 = types.InlineKeyboardButton(text="1t", callback_data=1)
-#         rele2 = types.InlineKeyboardButton(text="2t", callback_data=2)
-#         rele3 = types.InlineKeyboardButton(text="3t", callback_data=3)
-#         keyboard.add(rele1, rele2, rele3)
-#         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=answer, reply_markup=keyboard)
 
 bot.polling(none_stop=True)
