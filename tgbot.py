@@ -124,15 +124,15 @@ markup = types.ReplyKeyboardMarkup(row_width=1)
 markup.add('1')
 hide_markup = telebot.types.ReplyKeyboardRemove()
 
-chat_id = 0;
-answer = '';
+chat_id = 0
+answer = ''
 
 
 @bot.message_handler(content_types=['text'])
 def send_welcome(message):
     try:
-        global chat_id;
-        global answer;
+        global chat_id
+        global answer
         user = message.from_user
         texts = message.text
         chat_id = message.chat.id
@@ -232,12 +232,10 @@ def send_welcome(message):
 
         bot.send_message(message.chat.id, answer, parse_mode='Markdown', reply_markup=hide_markup)
 
-
-
     except Exception as e:
         bot.send_message(message.chat.id, e)
 
 
-print(chat_id, answer)
+# print(chat_id, answer)
 
 bot.polling(none_stop=True)
