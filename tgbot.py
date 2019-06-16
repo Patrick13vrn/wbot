@@ -106,7 +106,7 @@ emoji = {
 err_message = 'Что-то пошло не так...'
 
 
-# greating message
+# greeting message
 @bot.message_handler(commands=['start', 'go'])
 def start_handler(message):
     bot.send_message(
@@ -117,20 +117,22 @@ def start_handler(message):
 @bot.message_handler(commands=['help'])
 def start_handler(message):
     bot.send_message(
-        message.chat.id, 'Просто пришите название города на русском языке   .')
+        message.chat.id, 'Просто пришите название города на русском языке.')
 
 
 markup = types.ReplyKeyboardMarkup(row_width=1)
 markup.add('1')
 hide_markup = telebot.types.ReplyKeyboardRemove()
 
-
+chat_id = 0;
+answer = '';
 
 
 @bot.message_handler(content_types=['text'])
 def send_welcome(message):
     try:
-
+        global chat_id;
+        global answer;
         user = message.from_user
         texts = message.text
         chat_id = message.chat.id
@@ -203,9 +205,9 @@ def send_welcome(message):
                 else:
                     rain = ''
 
-                template = f_temp + '°, ' + f_status_detailed + rain + '\n'
-                forecast += str(datetime.strftime(f_date, '%H:%M')) + ' '
-                forecast += template
+                template = f_temp + '°, ' + f_status_detailed + rain + emojies.get(f_code, '') + '\n'
+                forecast += str(datetime.strftime(f_date, '%H:%M')) + ' ' + template
+                # forecast += template
 
             # вывод прогноза на 3 дня
             if f_now3 < f_date3 <= f_end:
@@ -235,5 +237,7 @@ def send_welcome(message):
     except Exception as e:
         bot.send_message(message.chat.id, e)
 
+
+print(chat_id, answer)
 
 bot.polling(none_stop=True)
