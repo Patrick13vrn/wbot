@@ -120,6 +120,7 @@ def start_handler(message):
         message.chat.id, 'Просто пришите название города на русском языке.')
 
 
+# /log
 @bot.message_handler(commands=['log'])
 def start_handler(message):
     with open('log.txt', mode='r') as file_log:
@@ -127,6 +128,14 @@ def start_handler(message):
         for line in file_log.readlines():
             log += line
     bot.send_message(message.chat.id, log)
+
+
+# /log clear
+@bot.message_handler(commands=['clr'])
+def start_handler(message):
+    with open('log.txt', mode='w') as file_log:
+        file_log.write("135483085;Алексей;Куксов;2019-06-22 13:22:38\n")
+    bot.send_message(message.chat.id, "Логи очищены.")
 
 
 markup = types.ReplyKeyboardMarkup(row_width=1)
@@ -244,8 +253,8 @@ def send_welcome(message):
         with open("log.txt", mode="r+") as file:
             file.seek(0, 2)
             file.write("{5}{0}{2}{0}{3}{0}{4}{1}".format(";", "\n", user.id, user.first_name, user.last_name,
-                                                               datetime.utcfromtimestamp(message.date).strftime(
-                                                                   '%Y-%m-%d %H:%M:%S')))
+                                                         datetime.utcfromtimestamp(message.date).strftime(
+                                                             '%Y-%m-%d %H:%M:%S')))
 
     except Exception as e:
         bot.send_message(message.chat.id, e)
