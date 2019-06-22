@@ -1,0 +1,2 @@
+TOKEN = '823149895:AAGUwtRQ9dOQPvtqA8ZxZYmhd2MA4GbUK8k'
+owm = pyowm.OWM('ee53bd221ce171abd050ae88362dc095', language='ru')
