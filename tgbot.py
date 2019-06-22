@@ -120,6 +120,15 @@ def start_handler(message):
         message.chat.id, 'Просто пришите название города на русском языке.')
 
 
+@bot.message_handler(commands=['log'])
+def start_handler(message):
+    with open('log.txt', mode='r') as file_log:
+        log = ''
+        for line in file_log.readlines():
+            log += line
+    bot.send_message(message.chat.id, log)
+
+
 markup = types.ReplyKeyboardMarkup(row_width=1)
 markup.add('1')
 hide_markup = telebot.types.ReplyKeyboardRemove()
@@ -234,7 +243,9 @@ def send_welcome(message):
 
         with open("log.txt", mode="r+") as file:
             file.seek(0, 2)
-            file.write("{2}{0}{3}{0}{4}{0}{5}{1}".format(";", "\n", user.id, user.first_name, user.last_name, texts))
+            file.write("{6}{0}{2}{0}{3}{0}{4}{0}{5}{1}".format(";", "\n", user.id, user.first_name, user.last_name,
+                                                         datetime.utcfromtimestamp(message.date).strftime(
+                                                             '%Y-%m-%d %H:%M:%S')))
 
 
 
