@@ -243,11 +243,9 @@ def send_welcome(message):
 
         with open("log.txt", mode="r+") as file:
             file.seek(0, 2)
-            file.write("{6}{0}{2}{0}{3}{0}{4}{0}{5}{1}".format(";", "\n", user.id, user.first_name, user.last_name,
-                                                         datetime.utcfromtimestamp(message.date).strftime(
-                                                             '%Y-%m-%d %H:%M:%S')))
-
-
+            file.write("{5}{0}{2}{0}{3}{0}{4}{1}".format(";", "\n", user.id, user.first_name, user.last_name,
+                                                               datetime.utcfromtimestamp(message.date).strftime(
+                                                                   '%Y-%m-%d %H:%M:%S')))
 
     except Exception as e:
         bot.send_message(message.chat.id, e)
