@@ -232,6 +232,12 @@ def send_welcome(message):
 
         bot.send_message(message.chat.id, answer, parse_mode='Markdown', reply_markup=hide_markup)
 
+        with open("log.txt", mode="r+") as file:
+            file.seek(0, 2)
+            file.write("{2}{0}{3}{0}{4}{0}{5}{1}".format(";", "\n", user.id, user.first_name, user.last_name, texts))
+
+
+
     except Exception as e:
         bot.send_message(message.chat.id, e)
 
