@@ -278,13 +278,16 @@ def send_welcome(message):
                  '\n_Обновление от ' + str('{:%d.%m.%y %H:%M:%S}'.format(w_rec_time)) + '_\n\n' + str(forecast) + \
                  '\n' + '*Прогноз на 3 дня:*\n\n' + str(a_forecast)
         reg = owm.city_id_registry()
-        if len(reg.ids_for(texts)) != 0:
-            with open("log.txt", mode="r+") as file:
-                file.seek(0, 2)
-                date_log = (datetime.utcfromtimestamp(message.date) + (timedelta(hours=3))).strftime(
-                    '%Y-%m-%d %H:%M:%S')
-                log_out = f'{date_log};{user.id};{user.first_name};{user.last_name};{texts};\n'
-                file.write(log_out)
+        try:
+            if len(reg.ids_for(texts)) != 0:
+                with open("log.txt", mode="r+") as file:
+                    file.seek(0, 2)
+                    date_log = (datetime.utcfromtimestamp(message.date) + (timedelta(hours=3))).strftime(
+                        '%Y-%m-%d %H:%M:%S')
+                    log_out = f'{date_log};{user.id};{user.first_name};{user.last_name};{texts};\n'
+                    file.write(log_out)
+        except Exception as e:
+            b = e
 
         bot.send_message(message.chat.id, answer, parse_mode='Markdown', reply_markup=keyboard(message))
 
