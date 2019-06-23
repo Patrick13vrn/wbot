@@ -3,12 +3,14 @@ from telebot import types
 import pyowm
 from datetime import datetime
 from datetime import timedelta
-
 import locale
+import secure
 
 locale.setlocale(locale.LC_ALL, 'ru_RU.utf8')
-TOKEN = '823149895:AAGUwtRQ9dOQPvtqA8ZxZYmhd2MA4GbUK8k'
-owm = pyowm.OWM('ee53bd221ce171abd050ae88362dc095', language='ru')
+TOKEN = secure.tg_token()
+
+locale.setlocale(locale.LC_ALL, 'ru_RU.utf8')
+owm = pyowm.OWM(secure.owm_token(), language='ru')
 bot = telebot.TeleBot(TOKEN)
 
 
