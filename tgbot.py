@@ -3,12 +3,14 @@ from telebot import types
 import pyowm
 from datetime import datetime
 from datetime import timedelta
-
 import locale
+import secure
 
 locale.setlocale(locale.LC_ALL, 'ru_RU.utf8')
-TOKEN = '823149895:AAGUwtRQ9dOQPvtqA8ZxZYmhd2MA4GbUK8k'
-owm = pyowm.OWM('ee53bd221ce171abd050ae88362dc095', language='ru')
+TOKEN = secure.tg_token()
+
+locale.setlocale(locale.LC_ALL, 'ru_RU.utf8')
+owm = pyowm.OWM(secure.owm_token(), language='ru')
 bot = telebot.TeleBot(TOKEN)
 
 
@@ -275,17 +277,12 @@ def send_welcome(message):
                  '\nОтносительная влажность: ' + str(w_humid) + '%' + \
                  '\n_Обновление от ' + str('{:%d.%m.%y %H:%M:%S}'.format(w_rec_time)) + '_\n\n' + str(forecast) + \
                  '\n' + '*Прогноз на 3 дня:*\n\n' + str(a_forecast)
-        reg = owm.city_id_registry()
-        try:
-            if len(reg.ids_for(texts)) != 0:
-                with open("log.txt", mode="r+") as file:
-                    file.seek(0, 2)
-                    date_log = (datetime.utcfromtimestamp(message.date) + (timedelta(hours=3))).strftime(
-                        '%Y-%m-%d %H:%M:%S')
-                    log_out = f'{date_log};{user.id};{user.first_name};{user.last_name};{texts};\n'
-                    file.write(log_out)
-        except Exception as e:
-            b = e
+        with open("log.txt", mode="r+") as file:
+            file.seek(0, 2)
+            date_log = (datetime.utcfromtimestamp(message.date) + (timedelta(hours=3))).strftime(
+                '%Y-%m-%d %H:%M:%S')
+            log_out = f'{date_log};{user.id};{user.first_name};{user.last_name};{texts};\n'
+            file.write(log_out)
 
         bot.send_message(message.chat.id, answer, parse_mode='Markdown', reply_markup=keyboard(message))
 
