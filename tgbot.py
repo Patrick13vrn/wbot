@@ -123,18 +123,24 @@ def start_handler(message):
 # /log
 @bot.message_handler(commands=['log'])
 def start_handler(message):
-    with open('log.txt', mode='rb') as file_log:
-        log = ''
-        for line in file_log.readlines():
-            log += line
+    try:
+        with open('log.txt', mode='rb') as file_log:
+            log = ''
+            for line in file_log.readlines():
+                log += line
+    except Exception as e:
+        bot.send_message(message.chat.id, e)
     bot.send_message(message.chat.id, log)
 
 
 # /log clear
 @bot.message_handler(commands=['clr'])
 def start_handler(message):
-    with open('log.txt', mode='w') as file_log:
-        file_log.write('')
+    try:
+        with open('log.txt', mode='w') as file_log:
+            file_log.write('')
+    except Exception as e:
+        bot.send_message(message.chat.id, e)
     bot.send_message(message.chat.id, "Логи очищены.")
 
 
