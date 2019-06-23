@@ -124,13 +124,13 @@ def start_handler(message):
 @bot.message_handler(commands=['log'])
 def start_handler(message):
     try:
-        with open('log.txt', mode='rb') as file_log:
+        with open('log.txt', mode='r+') as file_log:
             log = ''
             for line in file_log.readlines():
                 log += str(line)
+        bot.send_message(message.chat.id, log)
     except Exception as e:
         bot.send_message(message.chat.id, e)
-    bot.send_message(message.chat.id, log)
 
 
 # /log clear
@@ -139,9 +139,9 @@ def start_handler(message):
     try:
         with open('log.txt', mode='w') as file_log:
             file_log.write('')
+        bot.send_message(message.chat.id, "Логи очищены.")
     except Exception as e:
         bot.send_message(message.chat.id, e)
-    bot.send_message(message.chat.id, "Логи очищены.")
 
 
 @bot.message_handler(commands=['city'])
