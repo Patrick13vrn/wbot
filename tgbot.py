@@ -123,7 +123,7 @@ def start_handler(message):
 # /log
 @bot.message_handler(commands=['log'])
 def start_handler(message):
-    with open('log.txt', mode='r') as file_log:
+    with open('log.txt', mode='rb') as file_log:
         log = ''
         for line in file_log.readlines():
             log += line
