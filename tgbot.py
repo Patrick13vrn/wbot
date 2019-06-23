@@ -127,7 +127,7 @@ def start_handler(message):
         with open('log.txt', mode='r+') as file_log:
             log = ''
             for line in file_log.readlines():
-                log += str(line)
+                log += str(line.encode('utf-8').strip())
         bot.send_message(message.chat.id, log)
     except Exception as e:
         bot.send_message(message.chat.id, e)
