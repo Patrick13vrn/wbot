@@ -127,7 +127,7 @@ def start_handler(message):
         with open('log.txt', mode='r+') as file_log:
             log = ''
             for line in file_log.readlines():
-                log += str(line.encode('utf-8').strip())
+                log += str(line)
         bot.send_message(message.chat.id, log)
     except Exception as e:
         bot.send_message(message.chat.id, e)
@@ -143,17 +143,21 @@ def start_handler(message):
     except Exception as e:
         bot.send_message(message.chat.id, e)
 
-
+# /city outputs last searched city
 @bot.message_handler(commands=['city'])
 def start_handler(message):
-    data = []
-    with open('log.txt', 'r+') as file_log:
-        for line in file_log.readlines():
-            data += line.split(";")
-    bot.send_message(message.chat.id, message.from_user.id)
-    for i in data:
-        print(i)
-
+    try:
+        data = []
+        with open('log.txt', 'r+') as file_log:
+            for line in file_log.readlines():
+                data.append(line.split(";"))
+        rev_data = data[::-1]
+        for i in rev_data:
+            if i[1] == str(message.from_user.id):
+                bot.send_message(message.chat.id, i[4])
+                break
+    except Exception as e:
+        bot.send_message(message.chat.id, e)
 
 markup = types.ReplyKeyboardMarkup(row_width=1)
 markup.add('1')
@@ -270,7 +274,7 @@ def send_welcome(message):
         with open("log.txt", mode="r+") as file:
             file.seek(0, 2)
             date_log = (datetime.utcfromtimestamp(message.date) + (timedelta(hours=3))).strftime('%Y-%m-%d %H:%M:%S')
-            log_out = f'{date_log};{user.id};{user.first_name};{user.last_name};{texts}\n'
+            log_out = f'{date_log};{user.id};{user.first_name};{user.last_name};{texts};\n'
             file.write(log_out)
 
     except Exception as e:
