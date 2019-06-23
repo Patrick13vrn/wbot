@@ -1,7 +1,9 @@
 import telebot
-import pyowm
-from datetime import datetime, timedelta
 from telebot import types
+import pyowm
+from datetime import datetime
+from datetime import timedelta
+
 import locale
 
 locale.setlocale(locale.LC_ALL, 'ru_RU.utf8')
@@ -143,9 +145,9 @@ def start_handler(message):
     except Exception as e:
         bot.send_message(message.chat.id, e)
 
-# /city outputs last searched city
-@bot.message_handler(commands=['city'])
-def start_handler(message):
+
+# search for last requested city
+def last_city(message):
     try:
         data = []
         with open('log.txt', 'r+') as file_log:
@@ -154,27 +156,38 @@ def start_handler(message):
         rev_data = data[::-1]
         for i in rev_data:
             if i[1] == str(message.from_user.id):
-                bot.send_message(message.chat.id, i[4])
+                city = i[4]
                 break
     except Exception as e:
         bot.send_message(message.chat.id, e)
+    return city
 
-markup = types.ReplyKeyboardMarkup(row_width=1)
-markup.add('1')
-hide_markup = telebot.types.ReplyKeyboardRemove()
 
-chat_id = 0
+# /city outputs last searched city
+@bot.message_handler(commands=['city'])
+def start_handler(message):
+    try:
+        bot.send_message(message.chat.id, last_city(message))
+    except Exception as e:
+        bot.send_message(message.chat.id, e)
+
+
+# chat_id = 0
 answer = ''
+
+
+def keyboard(message):
+    markup = types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
+    btn1 = types.KeyboardButton(last_city(message))
+    markup.add(btn1)
+    return markup
 
 
 @bot.message_handler(content_types=['text'])
 def send_welcome(message):
     try:
-        global chat_id
-        global answer
         user = message.from_user
         texts = message.text
-        chat_id = message.chat.id
         observation = owm.weather_at_place(texts)
         f_3h = owm.three_hours_forecast(texts)
         w = observation.get_weather()
@@ -190,16 +203,10 @@ def send_welcome(message):
         w_temp = w.get_temperature('celsius')['temp']
         w_press = w.get_pressure()['press']
         w_code = w.get_weather_code()
-
-        # print(w2.get_weather)
-
         try:
             w_wdeg = (w.get_wind()['deg'])
         except KeyError:
             w_wdeg = 0.0
-
-        # current day weather forecast
-        #         for weather in w2:
 
         # 3days weather forecast
         for weather in w2:
@@ -207,7 +214,6 @@ def send_welcome(message):
             f_date = datetime.strptime(str(f_date2), '%Y-%m-%d %H:%M:%S')
             f_now2 = (datetime.strftime((datetime.today().replace(microsecond=0)), '%Y-%m-%d %H:%M:%S'))
             f_now = datetime.strptime(str(f_now2), '%Y-%m-%d %H:%M:%S')
-
             f_time = datetime.strftime(f_date, '%H')
             f_night = '03'
             f_morning = '09'
@@ -260,7 +266,8 @@ def send_welcome(message):
                     a_forecast += emoji.get('night') + template
                 elif f_time == f_day:
                     a_forecast += emoji.get('day') + template + '\n'
-        answer = user.first_name + ', *Сейчас в ' + texts + ':*\n\n' + emojies.get(w_code, '') + str(w_det).title() + \
+        answer = user.first_name + ', *Сейчас в ' + texts + ':*\n\n' + emojies.get(w_code, '') + str(
+            w_det).title() + \
                  '\nТемпература воздуха: ' + temp(w_temp) + '°' + \
                  '\nОблачность: ' + str(w_cloud) + '%' + \
                  '\nВетер: ' + str(w_wspeed) + ' м/с, ' + wind_d(w_wdeg) + \
@@ -268,14 +275,16 @@ def send_welcome(message):
                  '\nОтносительная влажность: ' + str(w_humid) + '%' + \
                  '\n_Обновление от ' + str('{:%d.%m.%y %H:%M:%S}'.format(w_rec_time)) + '_\n\n' + str(forecast) + \
                  '\n' + '*Прогноз на 3 дня:*\n\n' + str(a_forecast)
-
-        bot.send_message(message.chat.id, answer, parse_mode='Markdown', reply_markup=hide_markup)
-
         with open("log.txt", mode="r+") as file:
             file.seek(0, 2)
-            date_log = (datetime.utcfromtimestamp(message.date) + (timedelta(hours=3))).strftime('%Y-%m-%d %H:%M:%S')
+            date_log = (datetime.utcfromtimestamp(message.date) + (timedelta(hours=3))).strftime(
+                '%Y-%m-%d %H:%M:%S')
             log_out = f'{date_log};{user.id};{user.first_name};{user.last_name};{texts};\n'
             file.write(log_out)
+
+        bot.send_message(message.chat.id, answer, parse_mode='Markdown', reply_markup=keyboard(message))
+
+
 
     except Exception as e:
         bot.send_message(message.chat.id, e)
