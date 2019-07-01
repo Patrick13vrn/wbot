@@ -31,15 +31,17 @@ def wind_d(direction):
 
 
 # temp add plus and minus
-def temp(temp):
-    temp2 = float(temp)
+def temp(input_temp):
+    decimal = 0
+    temp2 = float(input_temp)
     if temp2 < 0:
         temp_sign = '-'
     elif temp2 > 0:
         temp_sign = '+'
     else:
         temp_sign = ''
-    temp_result = temp_sign + str(round(temp2))
+        decimal = 0
+    temp_result = temp_sign + str(round(temp2, decimal))
     return temp_result
 
 
@@ -124,7 +126,7 @@ def start_handler(message):
         message.chat.id, 'Просто пришите название города на русском языке.')
 
 
-# /log
+# /log displays the whole list of searches
 @bot.message_handler(commands=['log'])
 def start_handler(message):
     try:
@@ -132,12 +134,13 @@ def start_handler(message):
             log = ''
             for line in file_log.readlines():
                 log += str(line)
-        bot.send_message(message.chat.id, log)
+        if len(log) > 0:
+            bot.send_message(message.chat.id, log)
     except Exception as e:
         bot.send_message(message.chat.id, e)
 
 
-# /log clear
+# /clr clears the log's entries
 @bot.message_handler(commands=['clr'])
 def start_handler(message):
     try:
@@ -154,8 +157,8 @@ def last_city(message):
         data = []
         with open('log.txt', 'r+') as file_log:
             for line in file_log.readlines():
-                data.append(line.split(";"))
-        rev_data = data[::-1]
+                data.append(line.split(";"))  # String splitting with ";" sign
+        rev_data = data[::-1]  # reverse log
         for i in rev_data:
             if i[1] == str(message.from_user.id):
                 city = i[4]
@@ -252,7 +255,7 @@ def send_welcome(message):
                 else:
                     rain = ''
 
-                template = f_temp + '°, ' + f_status_detailed + rain + emojies.get(f_code, '') + '\n'
+                template = temp(f_temp) + '°, ' + f_status_detailed + rain + emojies.get(f_code, '') + '\n'
                 forecast += str(datetime.strftime(f_date, '%H:%M')) + ' ' + template
                 # forecast += template
 
@@ -262,7 +265,7 @@ def send_welcome(message):
                     rain = ' (' + lastrain + ' мм)'
                 else:
                     rain = ''
-                template = f_temp + '°, ' + f_status_detailed + emojies.get(f_code, '') + rain + '\n'
+                template = temp(f_temp) + '°, ' + f_status_detailed + emojies.get(f_code, '') + rain + '\n'
                 if f_time == f_night:
                     a_forecast += str(datetime.strftime(f_date, '%a, %d %B')) + '\n'
                     a_forecast += emoji.get('night') + template
