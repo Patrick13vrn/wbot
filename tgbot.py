@@ -1,10 +1,13 @@
-import telebot
-from telebot import types
-import pyowm
+import locale
 from datetime import datetime
 from datetime import timedelta
-import locale
+
+import pyowm
+import telebot
+from telebot import types
+
 import secure
+from libs import emojies, emoji
 
 locale.setlocale(locale.LC_ALL, 'ru_RU.utf8')
 TOKEN = secure.tg_token()
@@ -16,6 +19,11 @@ bot = telebot.TeleBot(TOKEN)
 
 # wind direction degree to NSWE
 def wind_d(direction):
+    """
+    Returns direction callout according to wind's direction in degrees
+    :param direction:
+    :return: direction wording
+    """
     return {
         direction == 0.0: '',
         0.0 < direction < 22.5: 'Северный',
@@ -32,6 +40,11 @@ def wind_d(direction):
 
 # temp add plus and minus
 def temp(input_temp):
+    """
+    Formats input temperature with "+" or "-" sign
+    :param input_temp:
+    :return: formated temperature
+    """
     decimal = 0
     temp2 = float(input_temp)
     if temp2 < 0:
@@ -46,67 +59,8 @@ def temp(input_temp):
 
 
 # emoji weather condition
-emojies = {
-    200: "\u26C8",  # гроза с мелким дождём
-    201: "\u26C8",  # гроза с дождём
-    202: "\u26C8",  # гроза с проливным дождём
-    210: "\U0001F329",  # возможна гроза
-    211: "\u26C8",  # гроза
-    212: "\U0001F32A",  # буря
-    221: "\u26C8",  # жестокая гроза
-    230: "\u26C8",  # гроза с мелким дождём
-    231: "\u26C8",  # гроза с дождём
-    232: "\u26C8",  # гроза с сильным дождём
-    300: "\U0001F4A7",  # сыро
-    301: "\U0001F4A7",  # сыро
-    302: "\U0001F4A7",  # очень сыро
-    310: "\U0001F326",  # лёгкий дождь
-    311: "\U0001F326",  # лёгкий дождь
-    312: "\U0001F327",  # интенсивный дождь
-    313: "\U0001F327",  # дождь и морось
-    314: "\U0001F327",  # сильный дождь и морось
-    321: "\U0001F326",  # мелкий дождь
-    500: "\U0001F326",  # легкий дождь
-    501: "\U0001F327",  # дождь
-    502: "\U0001F327",  # сильный дождь
-    503: "\U0001F327",  # проливной дождь
-    504: "\U0001F327",  # сильный дождь
-    511: "\U0001F327",  # холодный дождь
-    520: "\U0001F327",  # дождь
-    521: "\U0001F327",  # дождь
-    522: "\U0001F327",  # сильный дождь
-    531: "\U0001F327",  # переодические дожди
-    600: "\U0001F328",  # небольшой снегопад
-    601: "\U0001F328",  # снегопад
-    602: "\U0001F328",  # сильный снегопад
-    611: "\U0001F4A7",  # слякоть
-    612: "\U0001F328",  # дождь со снегом
-    620: "\U0001F328",  # мокрый снег
-    621: "\U0001F328",  # снегопад
-    622: "\U0001F328",  # сильный снегопад
-    701: "\U0001F32B",  # туман
-    711: "\U0001F32B",  # туманно
-    721: "\U0001F32B",  # туманно
-    731: "\U0001F3DC",  # песчаная буря
-    741: "\U0001F32B",  # туманно
-    751: "\U0001F3DC",  # песок
-    761: "\U0001F3DC",  # пыльная буря
-    762: "\U0001F3DC",  # вулканический пепел
-    771: "\U0001F32A",  # шквальный ветер
-    781: "\U0001F32A",  # торнадо
-    800: "\u2600",  # ясно
-    801: "\U0001F325",  # облачно
-    802: "\U0001F324",  # слегка облачно
-    803: "\u2601",  # пасмурно
-    804: "\u2601",  # пасмурно
-}
 
 # emoji constants
-emoji = {
-    "day": "\u2600",
-    "night": "\U0001F319",
-    "temp": "\U0001F321",
-}
 
 # messages
 err_message = 'Что-то пошло не так...'
@@ -130,7 +84,7 @@ def start_handler(message):
 @bot.message_handler(commands=['log'])
 def start_handler(message):
     try:
-        with open('log.txt', mode='r+') as file_log:
+        with open('logs.txt', mode='r+') as file_log:
             log = ''
             for line in file_log.readlines():
                 log += str(line)
@@ -143,8 +97,13 @@ def start_handler(message):
 # /clr clears the log's entries
 @bot.message_handler(commands=['clr'])
 def start_handler(message):
+    """
+    Clears the whole log file
+    :param message: none
+    :return: cleared log file
+    """
     try:
-        with open('log.txt', mode='w') as file_log:
+        with open('logs.txt', mode='w') as file_log:
             file_log.write('')
         bot.send_message(message.chat.id, "Логи очищены.")
     except Exception as e:
@@ -155,16 +114,18 @@ def start_handler(message):
 def last_city(message):
     try:
         data = []
-        with open('log.txt', 'r+') as file_log:
+        with open('logs.txt', 'r+') as file_log:
             for line in file_log.readlines():
                 data.append(line.split(";"))  # String splitting with ";" sign
         rev_data = data[::-1]  # reverse log
         for i in rev_data:
             if i[1] == str(message.from_user.id):
+                # the 5th position in log's string is a user's successfully requested city name
                 city = i[4]
                 break
     except Exception as e:
         bot.send_message(message.chat.id, e)
+        city = ''
     return city
 
 
@@ -175,10 +136,6 @@ def start_handler(message):
         bot.send_message(message.chat.id, last_city(message))
     except Exception as e:
         bot.send_message(message.chat.id, e)
-
-
-# chat_id = 0
-answer = ''
 
 
 def keyboard(message):
@@ -192,7 +149,7 @@ def keyboard(message):
 def send_welcome(message):
     try:
         user = message.from_user
-        texts = message.text
+        texts = message.text.capitalize()
         observation = owm.weather_at_place(texts)
         f_3h = owm.three_hours_forecast(texts)
         w = observation.get_weather()
@@ -251,37 +208,40 @@ def send_welcome(message):
             # вывод прогноза на сегодня
             if f_date3 < f_now3 + timedelta(days=1):
                 if lastrain != '0':
-                    rain = ' (' + lastrain + ' мм)'
+                    rain = f' ({lastrain} мм)'
                 else:
                     rain = ''
 
-                template = temp(f_temp) + '°, ' + f_status_detailed + rain + emojies.get(f_code, '') + '\n'
-                forecast += str(datetime.strftime(f_date, '%H:%M')) + ' ' + template
+                template = f"{temp(f_temp)}°, {f_status_detailed}{rain}{emojies.get(f_code, '')}\n"
+                forecast += f"{str(datetime.strftime(f_date, '%H:%M'))} {template}"
                 # forecast += template
 
             # вывод прогноза на 3 дня
             if f_now3 < f_date3 <= f_end:
                 if lastrain != '0':
-                    rain = ' (' + lastrain + ' мм)'
+                    rain = f' ({lastrain} мм)'
                 else:
                     rain = ''
-                template = temp(f_temp) + '°, ' + f_status_detailed + emojies.get(f_code, '') + rain + '\n'
+                template = f"{temp(f_temp)}°, {f_status_detailed}{emojies.get(f_code, '')}{rain}\n"
                 if f_time == f_night:
-                    a_forecast += str(datetime.strftime(f_date, '%a, %d %B')) + '\n'
-                    a_forecast += emoji.get('night') + template
+                    a_forecast += f"{str(datetime.strftime(f_date, '%a, %d %B'))}\n"
+                    a_forecast += f"{emoji.get('night')}{template}"
                 elif f_time == f_day:
-                    a_forecast += emoji.get('day') + template + '\n'
-        answer = user.first_name + ', *Сейчас в ' + texts + ':*\n\n' + emojies.get(w_code, '') + str(
-            w_det).title() + \
-                 '\nТемпература воздуха: ' + temp(w_temp) + '°' + \
-                 '\nОблачность: ' + str(w_cloud) + '%' + \
-                 '\nВетер: ' + str(w_wspeed) + ' м/с, ' + wind_d(w_wdeg) + \
-                 '\nАтмосферное давление: ' + str("{0:.0f}".format(round(w_press / 1.333, 0))) + ' мм.рт.ст' + \
-                 '\nОтносительная влажность: ' + str(w_humid) + '%' + \
-                 '\n_Обновление от ' + str('{:%d.%m.%y %H:%M:%S}'.format(w_rec_time)) + '_\n\n' + str(forecast) + \
-                 '\n' + '*Прогноз на 3 дня:*\n\n' + str(a_forecast)
-        with open("log.txt", mode="r+") as file:
-            file.seek(0, 2)
+                    a_forecast += f"{emoji.get('day')}{template}\n"
+
+        answer = f"{user.first_name}, cейчас в *{texts}:*\n\n" \
+            f"{emojies.get(w_code, '')}{str(w_det).title()}\n" \
+            f"Температура воздуха: {temp(w_temp)}°\n" \
+            f"Облачность: {str(w_cloud)}%\n" \
+            f"Ветер: {str(w_wspeed)} м/с, {wind_d(w_wdeg)}\n" \
+            f"Атмосферное давление: {str('{0:.0f}'.format(round(w_press / 1.333, 0)))} мм.рт.ст\n" \
+            f"Относительная влажность: {str(w_humid)}%\n" \
+            f"_Обновление от {str('{:%d.%m.%y %H:%M:%S}'.format(w_rec_time))}_\n\n" \
+            f"{str(forecast)}\n" \
+            f"*Прогноз на 3 дня:*\n\n" \
+            f"{str(a_forecast)}"
+        # logging
+        with open("logs.txt", mode="a") as file:
             date_log = (datetime.utcfromtimestamp(message.date) + (timedelta(hours=3))).strftime(
                 '%Y-%m-%d %H:%M:%S')
             log_out = f'{date_log};{user.id};{user.first_name};{user.last_name};{texts};\n'
@@ -292,7 +252,5 @@ def send_welcome(message):
     except Exception as e:
         bot.send_message(message.chat.id, e)
 
-
-# print(chat_id, answer)
 
 bot.polling(none_stop=True)
