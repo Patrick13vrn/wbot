@@ -1,9 +1,11 @@
+import os
+
+
 def tg_token():
-    token = '823149895:AAGUwtRQ9dOQPvtqA8ZxZYmhd2MA4GbUK8k'
+    token = os.getenv("TG_TOKEN")
     return token
 
 
 def owm_token():
-    token = 'ee53bd221ce171abd050ae88362dc095'
-    #dsfs
+    token = os.getenv("OWM_TOKEN")
     return token
