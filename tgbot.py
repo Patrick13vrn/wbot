@@ -190,12 +190,12 @@ def send_welcome(message):
             f_now3 = f_now.replace(hour=0, minute=0, second=0)
             f_date3 = f_date.replace(hour=0, minute=0, second=0)
             raw_temp = round(weather.get_temperature('celsius')['temp'])
-            if raw_temp > 0:
-                f_temp = '+' + str(raw_temp)
-            elif raw_temp < 0:
-                f_temp = '-' + str(raw_temp)
-            else:
-                f_temp = str(raw_temp)
+            # if raw_temp > 0:
+            #     f_temp = '+' + str(raw_temp)
+            # elif raw_temp < 0:
+            #     f_temp = '-' + str(raw_temp)
+            # else:
+            #     f_temp = str(raw_temp)
 
             f_status_detailed = str(weather.get_detailed_status())
             f_rain = weather.get_rain()
@@ -212,7 +212,7 @@ def send_welcome(message):
                 else:
                     rain = ''
 
-                template = f"{temp(f_temp)}°, {f_status_detailed}{rain}{emojies.get(f_code, '')}\n"
+                template = f"{temp(raw_temp)}°, {f_status_detailed}{rain}{emojies.get(f_code, '')}\n"
                 forecast += f"{str(datetime.strftime(f_date, '%H:%M'))} {template}"
                 # forecast += template
 
@@ -222,7 +222,7 @@ def send_welcome(message):
                     rain = f' ({lastrain} мм)'
                 else:
                     rain = ''
-                template = f"{temp(f_temp)}°, {f_status_detailed}{emojies.get(f_code, '')}{rain}\n"
+                template = f"{temp(raw_temp)}°, {f_status_detailed}{emojies.get(f_code, '')}{rain}\n"
                 if f_time == f_night:
                     a_forecast += f"{str(datetime.strftime(f_date, '%a, %d %B'))}\n"
                     a_forecast += f"{emoji.get('night')}{template}"
@@ -248,16 +248,6 @@ def send_welcome(message):
             file.write(log_out)
 
         bot.send_message(message.chat.id, answer, parse_mode='Markdown', reply_markup=keyboard(message))
-
-        if call.data == "second":
-            keyboard2 = types.InlineKeyboardMarkup()
-            back_button = types.InlineKeyboardButton(text="Назад", callback_data="back")
-            keyboard2.add(back_button)
-            bot.edit_message_text(chat_id=call.message.chat.id, parse_mode='Markdown',
-                                  message_id=call.message.message_id, text=answer,
-                                  reply_markup=keyboard2)
-        else:
-            False
 
     except Exception as e:
         bot.send_message(message.chat.id, e)
