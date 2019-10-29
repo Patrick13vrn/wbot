@@ -48,7 +48,7 @@ def temp(input_temp):
     decimal = 0
     temp2 = float(input_temp)
     if temp2 < 0:
-        temp_sign = '-'
+        temp_sign = ''
     elif temp2 > 0:
         temp_sign = '+'
     else:
@@ -248,6 +248,16 @@ def send_welcome(message):
             file.write(log_out)
 
         bot.send_message(message.chat.id, answer, parse_mode='Markdown', reply_markup=keyboard(message))
+
+        if call.data == "second":
+            keyboard2 = types.InlineKeyboardMarkup()
+            back_button = types.InlineKeyboardButton(text="Назад", callback_data="back")
+            keyboard2.add(back_button)
+            bot.edit_message_text(chat_id=call.message.chat.id, parse_mode='Markdown',
+                                  message_id=call.message.message_id, text=answer,
+                                  reply_markup=keyboard2)
+        else:
+            False
 
     except Exception as e:
         bot.send_message(message.chat.id, e)
